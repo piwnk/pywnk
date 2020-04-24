@@ -8,3 +8,5 @@ if os.path.exists(CONFIG_FILE):
     with open(CONFIG_FILE) as fh:
         config = json.load(fh, object_hook=lambda d: namedtuple(
             'config', d.keys())(*d.values()))
+else:
+  config = None
