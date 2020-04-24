@@ -2,10 +2,13 @@ import cProfile
 import pstats
 import io
 import time
-from multiprocessing.pool import ThreadPool
-from multiprocessing.context import TimeoutError
 from functools import wraps
 
+from multiprocessing.pool import ThreadPool
+try:
+    from multiprocessing import TimeoutError
+except:
+    from multiprocessing.context import TimeoutError
 
 def profiler(report='profiler.txt'):
     def decorator(func):
