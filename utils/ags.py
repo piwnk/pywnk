@@ -1,5 +1,7 @@
 import requests as r
 import time
+import re
+
 TOKEN = 'asdfasdfasdfasfd'
 
 
@@ -57,3 +59,14 @@ def post_async(url, body, check_interval=3, print_messages=False):
                     print(f'\t{mess}')
 
     return job_response
+
+
+def service_project_finder(directory, name, search_directory, extensions=['aprx', 'mxd', 'mapx']):
+    """mxd or aprx document finder"""
+    for root, dirs, files in walk(search_directory):
+        pattern = rf'arcgisinput{sep*2}?{directory or ""}{sep*2}({name})\.MapServer'
+        for f in files:
+            if re.search(pattern, root) and any(f.endswith(ext) for ext in extensions):
+                yield path.join(root, f)
+
+    print('No file found')
