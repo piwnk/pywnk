@@ -8,10 +8,11 @@ warnings.filterwarnings("ignore")
 
 def is_port_open(host, port):
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-        return sock.connect_ex((host, port)) == 0
+        sock.settimeout(1)
+        return sock.connect_ex((host.strip(), port)) == 0
 
 
-def is_valid(url, method='post'):
+def is_url_valid(url, method='get'):
     response = getattr(r, method)(url, verify=False)
     return response.ok
 
@@ -19,7 +20,6 @@ def is_valid(url, method='post'):
 if __name__ == "__main__":
     host = r"wp.pl"
     port = 443
-    url = 'https://{}:{}'.format(host, port)
 
     print(is_port_open(host, port))
-    print(is_valid(url))
+    print(is_url_valid('https://{}:{}'.format(host, port)))
