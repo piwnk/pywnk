@@ -5,38 +5,18 @@ import numpy as np
 from .envs import SQL_SERVER_CONNECTION_STRING
 
 
-def select(query, connection_string=SQL_SERVER_CONNECTION_STRING):
-    # print(query)
-    sql_conn = pyodbc.connect(connection_string)
-    df = pd.read_sql(query, sql_conn)
-    sql_conn.close()
-    return df
-
-
-def insert(table, fields, rows, connection_string=SQL_SERVER_CONNECTION_STRING):
-    fields_len = len(fields)
-    if not all(len(row) == fields_len for row in rows):
-        raise Exception("row lengts different than fields count")
-
-    sql_conn = pyodbc.connect(connection_string)
-    cursor = sql_conn.cursor()
-
-    rows_unnumpyed = [
-        [int(v) if type(v) == np.int64 else v for v in row]
-        for row in rows
-    ]
-    values_placeholder = ','.join(fields_len * "?")
-    sql = f"insert into {table} ({','.join(fields)}) values ({values_placeholder})"
-    print(sql)
-    cursor.executemany(sql, rows_unnumpyed)
-    cursor.commit()
-    sql_conn.close()
-
-
-class SQL_CONNECTOR:
+class SqlConnector:
     def __init__(self, connection_string=SQL_SERVER_CONNECTION_STRING):
+        self.connection_string = connection_string
         self.connection = pyodbc.connect(connection_string)
         self.cursor = self.connection.cursor()
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self):
+        self.connection.close()
+        print('Connection closed')
 
     def select(self, table, fields="*", clauses=""):
         if isinstance(fields, list):
@@ -76,7 +56,7 @@ class SQL_CONNECTOR:
         self.exec(sql)
 
 
-class SDE_CONNECTOR(SQL_CONNECTOR):
+class SdeConnector(SqlConnector):
     def get_new_object_id(self, table):
         sql = """
             DECLARE @out int;
