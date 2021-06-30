@@ -11,10 +11,11 @@ class SqlConnector:
         self.connection = pyodbc.connect(connection_string)
         self.cursor = self.connection.cursor()
 
-    def __enter__(self):
-        pass
+    def __enter__(self, *args, **kwargs):
+        # self.__init__(*args, **kwargs)
+        return self
 
-    def __exit__(self):
+    def __exit__(self, *args):
         self.connection.close()
         print('Connection closed')
 
